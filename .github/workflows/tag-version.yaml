@@ -9,6 +9,9 @@ jobs:
   new-tag:
     runs-on: ubuntu-latest
     steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
       - name: Conventional Changelog Action
         uses: TriPSs/conventional-changelog-action@v3
         with:
