@@ -21,7 +21,7 @@ jobs:
       - name: Conventional Changelog Action
         uses: TriPSs/conventional-changelog-action@v4
         with:
-          github-token: ''
+#          github-token: ''
           git-user-name: 'Release Action'
           git-user-email: 'release-action@github.actions.com'
           preset: 'conventionalcommits'
