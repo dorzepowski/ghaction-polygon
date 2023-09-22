@@ -34,4 +34,5 @@ jobs:
           skip-version-file: 'true'
           skip-commit: 'true'
           skip-ci: 'false'
+          skip-git-pull: 'true'
 #          git-branch: 'my-maintenance-branch'
