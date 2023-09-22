@@ -1,0 +1,6 @@
+pull_request_rules:
+  - name: Automatic approve
+    actions:
+      review:
+        type: APPROVE
+        message: Automatically approving
