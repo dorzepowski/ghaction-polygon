@@ -33,7 +33,7 @@ jobs:
           ####
           # In case of Go release, where we don't have version file, the following two 'skip-*' flags must be set to true
           ####
-          skip-version-file: 'true'
-          skip-commit: 'true'
+#          skip-version-file: 'true'
+#          skip-commit: 'true'
 
 
