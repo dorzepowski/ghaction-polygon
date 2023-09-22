@@ -21,7 +21,7 @@ jobs:
       - name: Conventional Changelog Action
         uses: TriPSs/conventional-changelog-action@v3
         with:
-#          github-token: ${{ secrets.github_token }}
+          github-token: ''
 #          git-message: 'chore(release): {version}'
 #          git-user-name: 'Awesome Changelog Action'
 #          git-user-email: 'awesome_changelog@github.actions.com'
