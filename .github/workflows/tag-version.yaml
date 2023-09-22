@@ -19,7 +19,7 @@ jobs:
           ssh-key: ${{ secrets.RELEASE_KEY }}
 
       - name: Conventional Changelog Action
-        uses: TriPSs/conventional-changelog-action@v3
+        uses: TriPSs/conventional-changelog-action@v4
         with:
           github-token: ''
           git-user-name: 'Release Action'
