@@ -1,0 +1,10 @@
+pull_request_rules:
+  - name: Automatic approve
+    conditions:
+      - label!=do-not-merge
+    actions:
+      review:
+        type: APPROVE
+        message: Automatically approving
+      merge:
+        method: merge
