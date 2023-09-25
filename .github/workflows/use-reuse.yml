@@ -1,4 +1,4 @@
-name: use reuse
+name: "use reuse"
 on: workflow_dispatch
 jobs:
   run-it-default:
