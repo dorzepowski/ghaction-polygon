@@ -1,11 +1,12 @@
 name: "Reuse me"
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       os:
         description: "OS"
         default: '["ubuntu-latest", "macos-latest"]'
+        type: string
 
 jobs:
   build:
