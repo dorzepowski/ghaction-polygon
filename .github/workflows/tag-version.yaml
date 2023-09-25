@@ -19,6 +19,7 @@ jobs:
           ssh-key: ${{ secrets.RELEASE_KEY }}
 
       - name: Conventional Changelog Action
+        id: tag-changelog
         uses: TriPSs/conventional-changelog-action@v4
         with:
 #          github-token: ''
@@ -36,4 +37,7 @@ jobs:
 #          skip-version-file: 'true'
 #          skip-commit: 'true'
 
+      - name: Prepare draft of release
+        run: |
+          gh release create ${{ steps.changelog.outputs.tag }} --draft -n "${{ steps.tag-changelog.outputs.clean_changelog }}" -t "Release ${{ steps.changelog.outputs.tag }}" 
 
