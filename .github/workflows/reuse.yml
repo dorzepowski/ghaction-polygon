@@ -6,6 +6,7 @@ on:
       os:
         description: "OS"
         default: '["ubuntu-latest", "macos-latest"]'
+        required: false
         type: string
 
 jobs:
