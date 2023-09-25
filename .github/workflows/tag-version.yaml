@@ -37,4 +37,5 @@ jobs:
       - name: Prepare draft of release
         run: |
           gh release create ${{ steps.changelog.outputs.tag }} --draft -n "${{ steps.tag-changelog.outputs.clean_changelog }}" -t "Release ${{ steps.changelog.outputs.tag }}" 
-
+        env:
+          GH_TOKEN: ${{ github.token }}
