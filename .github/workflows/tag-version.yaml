@@ -7,6 +7,6 @@ on:
 
 jobs:
   new-tag:
-    uses: bactions/workflows/tag-new-version.yml@main
+    uses: bactions/workflows/.github/workflows/tag-new-version.yml@main
     with:
       deploy_key: ${{ secrets.RELEASE_KEY }}
