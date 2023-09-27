@@ -8,5 +8,5 @@ on:
 jobs:
   new-tag:
     uses: bactions/workflows/.github/workflows/tag-new-version.yml@main
-    with:
+    secrets:
       deploy_key: ${{ secrets.RELEASE_KEY }}
