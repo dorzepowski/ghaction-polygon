@@ -1,9 +1,8 @@
-name: "Tag version"
+name: "Tag new version"
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 permissions:
   contents: write
