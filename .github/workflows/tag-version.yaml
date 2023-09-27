@@ -5,37 +5,8 @@ on:
       - main
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   new-tag:
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          ssh-key: ${{ secrets.RELEASE_KEY }}
-
-      - name: Conventional Changelog Action
-        id: tag-changelog
-        uses: TriPSs/conventional-changelog-action@v4
-        with:
-#          github-token: ''
-          git-user-name: 'Release Action'
-          git-user-email: 'release-action@github.actions.com'
-          preset: 'conventionalcommits'
-          skip-git-pull: 'true'
-          output-file: 'false'
-#          release-count: '10'
-#          version-file: './my_custom_version_file.json' // or .yml, .yaml, .toml, mix.exs
-#          version-path: 'path.to.version'
-          skip-version-file: 'true'
-          skip-commit: 'true'
-
-      - name: Prepare draft of release
-        run: |
-          gh release create ${{ steps.tag-changelog.outputs.tag }} --draft -n "${{ steps.tag-changelog.outputs.clean_changelog }}" -t "Release ${{ steps.tag-changelog.outputs.tag }}"
-        env:
-          GH_TOKEN: ${{ github.token }}
+    uses: bactions/workflows/tag-new-version.yml@main
+    with:
+      deploy_key: ${{ secrets.RELEASE_KEY }}
