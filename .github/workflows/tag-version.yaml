@@ -5,6 +5,9 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   new-tag:
     uses: bactions/workflows/.github/workflows/tag-new-version.yml@main
