@@ -2,6 +2,7 @@ package main
 
 import (
 	"4chain-ag/ghaction-polygon/api"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,5 +27,4 @@ func main() {
 	r.GET("/testapi/get-string-by-int/:some_id", api.GetStringByInt)
 	r.GET("//testapi/get-struct-array-by-string/:some_id", api.GetStructArrayByString)
 	r.Run()
-
 }

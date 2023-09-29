@@ -22,11 +22,29 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ssh-key: ${{ secrets.RELEASE_KEY }}
+
+      ################################################
+      # Prepare programming language environment
+      ################################################
       - uses: actions/setup-go@v4
         with:
           go-version: ${{env.GO_VERSION}}
+
+      ############################################################
+      # generate - run generation of go files if needed
+      ############################################################
+
+      # TODO: choose a common way to do that
+
+      ############
+      # go mod
+      ############
       - name: Go Module tidy
         run: go mod tidy
+
+     ############
+     # YAML lint
+     ############
       - name: Run yaml linter
         id: yaml-lint
         uses: ibiqlik/action-yamllint@v3.1
@@ -35,12 +53,15 @@ jobs:
             extends: default
             ignore:
               - swagger.yaml
+              - .golangci.yml
             rules:
               truthy:
                 check-keys: false
               document-start:
                 present: false
                 level: warning
+              line-length:
+                max: 120
       - uses: actions/upload-artifact@v3
         if: always()
         with:
@@ -51,9 +72,27 @@ jobs:
         if: always()
         run: rm ${{ steps.yaml-lint.outputs.logfile }}
 
+
+      ############################################################
+      # linelint - add new lines at the end of files if needed
+      ############################################################
+
+      # TODO: run a command to do so, or adjust (modify) linelint action for that
+
+      ########################
+      # lint & fix code style
+      ########################
+
+      # TODO: split golangci-lint configurations for code style and errors
+      # consider unexcluding config files in a yaml lint step (above)
+
+      ###################
+      # Push changes
+      ###################
       - name: "Commit & Push"
         id: commit
         if: always()
+#        run: git status
         uses: EndBug/add-and-commit@v9
         with:
           message: "chore: update generated files"

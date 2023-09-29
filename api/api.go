@@ -18,7 +18,6 @@ import (
 //	@Failure		404		{object}	web.APIError	"Can not find ID"
 //	@Router			/testapi/get-string-by-int/{some_id} [get]
 func GetStringByInt(*gin.Context) {
-
 }
 
 // GetStructArrayByString example
@@ -59,10 +58,9 @@ func Upload(*gin.Context) {
 //	@Summary	use Anonymous field
 //	@Success	200	{object}	web.RevValue	"ok"
 func AnonymousField() {
-
 }
 
-// Pet3 example
+// Pet3 example.
 type Pet3 struct {
 	ID int `json:"id"`
 }
