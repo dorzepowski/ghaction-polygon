@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,6 +19,7 @@ import (
 //	@Failure		404		{object}	web.APIError	"Can not find ID"
 //	@Router			/testapi/get-string-by-int/{some_id} [get]
 func GetStringByInt(*gin.Context) {
+	fmt.Println("GetStringByInt")
 }
 
 // GetStructArrayByString example
@@ -35,6 +37,7 @@ func GetStringByInt(*gin.Context) {
 //	@Router			/testapi/get-struct-array-by-string/{some_id} [get]
 func GetStructArrayByString(*gin.Context) {
 	// write your code
+	fmt.Println("GetStructArrayByString")
 }
 
 // Upload example
@@ -51,6 +54,7 @@ func GetStructArrayByString(*gin.Context) {
 //	@Router			/file/upload [post]
 func Upload(*gin.Context) {
 	// write your code
+	fmt.Println("Upload")
 }
 
 // AnonymousField example
@@ -58,6 +62,7 @@ func Upload(*gin.Context) {
 //	@Summary	use Anonymous field
 //	@Success	200	{object}	web.RevValue	"ok"
 func AnonymousField() {
+	fmt.Println("AnonymousField")
 }
 
 // Pet3 example.

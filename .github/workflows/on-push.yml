@@ -44,9 +44,9 @@ jobs:
       - name: Go Module tidy
         run: go mod tidy
 
-     ############
-     # YAML lint
-     ############
+      ############
+      # YAML lint
+      ############
       - name: Run yaml linter
         id: yaml-lint
         uses: ibiqlik/action-yamllint@v3.1
@@ -117,3 +117,60 @@ jobs:
           skip-cache: false
           skip-pkg-cache: false
           skip-build-cache: false
+
+  compile:
+    name: Compile
+    runs-on: ubuntu-latest
+    needs: [code-style]
+    if: ${{ !cancelled() && needs.code-style.outputs.updatedCode != 'true' }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{env.GO_VERSION}}
+      - name: Go Build
+        run: go build -v ./...
+
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: [code-style]
+    if: ${{ !cancelled() && needs.code-style.outputs.updatedCode != 'true' }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{env.GO_VERSION}}
+
+      # Install gotestfmt on the VM running the action.
+      - name: Set up gotestfmt
+        uses: GoTestTools/gotestfmt-action@v2
+
+      # Run tests with nice formatting. Save the original log in /tmp/gotest.log
+      - name: Run tests
+        run: |
+          set -euo pipefail
+          go test -json -coverprofile=coverage.txt -covermode=atomic -v ./... 2>&1 | tee gotest.log | gotestfmt
+
+      # Upload the original go test log as an artifact for later review.
+      - name: Upload test & coverage reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-report
+          path: |
+            gotest.log
+            coverage.txt
+          if-no-files-found: error
+
+      - name: Update code coverage
+        if: ${{ env.CODECOV_TOKEN != '' }}
+        uses: codecov/codecov-action@v3.1.4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unittests
+          fail_ci_if_error: false # optional (default = false)
+          verbose: true # optional (default = false)
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
