@@ -10,6 +10,7 @@ on:
 env:
   GO_VERSION: '1.20'
   MAIN_FILE: 'cmd/main.go'
+  BUILD_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
 permissions:
   contents: write
@@ -19,6 +20,7 @@ jobs:
     name: Code Style
     runs-on: ubuntu-latest
     outputs:
+      id: ${{ github.job }}
       updatedCode: ${{ steps.commit.outputs.pushed }}
     steps:
       - uses: actions/checkout@v4
@@ -79,7 +81,8 @@ jobs:
       # linelint - add new lines at the end of files if needed
       ############################################################
 
-      # TODO: run a command to do so, or adjust (modify) linelint action for that
+      # TODO: run a command to do so,
+      # TODO: or adjust (modify) linelint action for that, so it won't need config file
 
       ########################
       # lint & fix code style
@@ -102,6 +105,8 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    outputs:
+      id: ${{ github.job }}
     needs: [code-style]
     if: ${{ !cancelled() && needs.code-style.outputs.updatedCode != 'true' }}
     steps:
@@ -121,6 +126,8 @@ jobs:
   compile:
     name: Compile
     runs-on: ubuntu-latest
+    outputs:
+      id: ${{ github.job }}
     needs: [code-style]
     if: ${{ !cancelled() && needs.code-style.outputs.updatedCode != 'true' }}
     steps:
@@ -135,6 +142,8 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    outputs:
+      id: ${{ github.job }}
     needs: [code-style]
     if: ${{ !cancelled() && needs.code-style.outputs.updatedCode != 'true' }}
     steps:
@@ -170,7 +179,114 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: unittests
-          fail_ci_if_error: false # optional (default = false)
-          verbose: true # optional (default = false)
+          fail_ci_if_error: false
+          verbose: true
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  notify:
+    name: "Notify"
+    runs-on: ubuntu-latest
+    needs: [code-style, lint, compile, test]
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      REPO_URL: ${{github.server_url}}/${{ github.repository }}
+    if: ${{ !cancelled() && needs.code-style.outputs.updatedCode != 'true' }}
+    steps:
+      - name: "Slack notification is skipped because secret SLACK_WEBHOOK_URL is not set"
+        if: ${{ env.SLACK_WEBHOOK_URL == '' }}
+        run: echo "::notice::Slack notification is skipped because secret SLACK_WEBHOOK_URL is not set"
+
+      - uses: actions/checkout@v3
+      - name: Matching PR
+        id: matching-pr
+        run: |
+          GH_PAGER=cat gh pr list -H ${{ github.ref_name }} --json url,number,title \
+          -q '.[0] | @text "msg=<\(.url//"${{ env.REPO_URL }}/pulls")|\(.title//"Not Found, check the list here.")>"' \
+          >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - uses: actions/github-script@v6
+        id: failed-checks
+        if: ${{ contains(needs.*.result, 'failure') && env.SLACK_WEBHOOK_URL != '' }}
+        with:
+          script: |
+            const needs = ${{ toJSON(needs) }}
+            return Object.entries(needs)
+                  .filter(([_,v]) => v.result === 'failure')
+                  .map(([key]) => '`' + key + '`')
+                  .join(', ')
+          result-encoding: string
+
+      - name: "Notify success"
+        if: ${{ steps.failed-checks.outputs.result == '' && env.SLACK_WEBHOOK_URL != '' }}
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "attachments": [
+                {
+                  "fallback": "${{ github.repository }} Checks Passed!",
+                  "color": "good",
+                  "title": "Checks Passed!",
+                  "title_link": "${{ env.BUILD_URL }}",
+                  "text": "All checks has succeed!",
+                  "fields": [
+                    {
+                      "title": "Project",
+                      "value": "<${{ env.REPO_URL }}|${{ github.repository }}>",
+                      "short": true
+                    },
+                    {
+                      "title": "Branch",
+                      "value": "${{ github.ref_name }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Pull Request",
+                      "value": "${{ steps.matching-pr.outputs.msg }}",
+                      "short": false
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      - name: "Notify failure"
+        if: ${{ steps.failed-checks.outputs.result != '' && env.SLACK_WEBHOOK_URL != '' }}
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "attachments": [
+                {
+                  "fallback": "${{ github.repository }} Checks Failed!",
+                  "color": "danger",
+                  "title": "Checks Failed!",
+                  "title_link": "${{ env.BUILD_URL }}",
+                  "text": "Checks ${{steps.failed-checks.outputs.result}} failed!",
+                  "fields": [
+                    {
+                      "title": "Project",
+                      "value": "<${{ env.REPO_URL }}|${{ github.repository }}>",
+                      "short": true
+                    },
+                    {
+                      "title": "Branch",
+                      "value": "${{ github.ref_name }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Pull Request",
+                      "value": "${{ steps.matching-pr.outputs.msg }}",
+                      "short": false
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
