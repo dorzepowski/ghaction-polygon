@@ -19,6 +19,5 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            console.log(context.inputs)
-            console.log(context.inputs.os)
-            return context.inputs
+            const systems = '${{ inputs.os }}'
+            console.log(systems)
