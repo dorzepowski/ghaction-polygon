@@ -1,0 +1,17 @@
+name: "On push changes"
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  on-push:
+    uses: bactions/workflows/.github/workflows/on-push.yml@main
+    secrets:
+      deploy_key: ${{ secrets.RELEASE_KEY }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
