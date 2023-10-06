@@ -20,6 +20,7 @@ jobs:
       - id: os
         uses: actions/github-script@v6
         with:
+          result-encoding: string
           script: |
             const systems = '${{ inputs.os }}'
             const osToImage = {
@@ -27,13 +28,15 @@ jobs:
                 'linux': 'ubuntu-latest'
             }
             
-            return systems.split(',').map(os => osToImage[os])
+            const result = systems.split(',').map(os => osToImage[os]);
+            console.log(result)
+            return result
 
   build:
     needs: [resolve-config]
     strategy:
       matrix:
-        os: ${{ needs.resolve-config.outputs.os }}
+        os: ${{ fromJSON(needs.resolve-config.outputs.os) }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: "OS print"
