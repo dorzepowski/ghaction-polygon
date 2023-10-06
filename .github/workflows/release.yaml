@@ -11,8 +11,8 @@ on:
 
 jobs:
   release_default:
-    uses: ./.github/workflows/reuse.yml
+    uses: ./.github/workflows/on-release.yml
   release_single:
-    uses: ./.github/workflows/reuse.yml
+    uses: ./.github/workflows/on-release.yml
     with:
       os: 'linux'
