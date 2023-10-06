@@ -11,6 +11,14 @@ on:
         required: false
         type: string
 
+env:
+  OS_MAPPING: | 
+    {
+      'darwin': 'macos-latest',
+      'linux': 'ubuntu-latest'
+    }
+    
+
 jobs:
   resolve-config:
     runs-on: ubuntu-latest
@@ -23,10 +31,7 @@ jobs:
           result-encoding: string
           script: |
             const systems = '${{ inputs.os }}'
-            const osToImage = {
-                'darwin': 'macos-latest',
-                'linux': 'ubuntu-latest'
-            }
+            const osToImage = ${{ env.OS_MAPPING }}
             
             const result = systems.split(',').map(os => osToImage[os]);
             console.log(result)
