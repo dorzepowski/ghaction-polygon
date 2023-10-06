@@ -28,14 +28,12 @@ jobs:
       - id: os
         uses: actions/github-script@v6
         with:
-          result-encoding: string
           script: |
             const systems = '${{ inputs.os }}'
             const osToImage = ${{ env.OS_MAPPING }}
             
-            const result = systems.split(',').map(os => osToImage[os]);
-            console.log(result)
-            return JSON.stringify(result)
+            return systems.split(',').map(os => osToImage[os]);
+
 
   build:
     needs: [resolve-config]
