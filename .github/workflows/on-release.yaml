@@ -14,10 +14,27 @@ on:
 jobs:
   resolve-config:
     runs-on: ubuntu-latest
+    outputs:
+      os: $${{ steps.os.outputs.result }}
     steps:
       - id: os
         uses: actions/github-script@v6
         with:
           script: |
             const systems = '${{ inputs.os }}'
-            console.log(systems)
+            const osToImage = {
+                'darwin': 'macos-latest',
+                'linux': 'ubuntu-latest'
+            }
+            
+            return systems.split(',').map(os => osToImage[os])
+
+  build:
+    needs: [resolve-config]
+    strategy:
+      matrix:
+        os: ${{ needs.resolve-config.outputs.os }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: "OS print"
+        run: "uname"
