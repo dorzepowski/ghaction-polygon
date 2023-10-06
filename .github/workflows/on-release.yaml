@@ -15,7 +15,7 @@ jobs:
   resolve-config:
     runs-on: ubuntu-latest
     outputs:
-      os: $${{ steps.os.outputs.result }}
+      os: ${{ steps.os.outputs.result }}
     steps:
       - id: os
         uses: actions/github-script@v6
@@ -30,7 +30,7 @@ jobs:
             
             const result = systems.split(',').map(os => osToImage[os]);
             console.log(result)
-            return result
+            return JSON.stringify(result)
 
   build:
     needs: [resolve-config]
