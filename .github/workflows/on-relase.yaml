@@ -1,0 +1,24 @@
+name: Release
+permissions:
+  contents: write
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        description: "Comma separated list of OS for which the binary should be built"
+        default: 'linux,darwin'
+        required: false
+        type: string
+
+jobs:
+  resolve-config:
+    runs-on: ubuntu-latest
+    steps:
+      - id: os
+        uses: actions/github-script@v6
+        with:
+          script: |
+            console.log(context.inputs)
+            console.log(context.inputs.os)
+            return context.inputs

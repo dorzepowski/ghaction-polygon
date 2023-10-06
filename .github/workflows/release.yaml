@@ -6,10 +6,13 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Release"
-        run: echo "RELEASING ..."
+  release_default:
+    uses: ./.github/workflows/reuse.yml
+  release_single:
+    uses: ./.github/workflows/reuse.yml
+    with:
+      os: 'linux'
