@@ -59,4 +59,10 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version: ${{inputs.go_version}}
-      - run: go env GOOS
+      - run: echo '${{github.workflow}}'
+      - run: echo '${{github.workflow_ref}}'
+      - run: echo '${{github.workflow_sha}}'
+      - run: echo '${{ toJSON(github.event) }}'
+#      - name: Build for amd64
+#        run: GOARCH=amd64 go build -o
+
