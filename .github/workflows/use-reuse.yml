@@ -1,9 +1,0 @@
-name: "use reuse"
-on: workflow_dispatch
-jobs:
-  run-it-default:
-    uses: ./.github/workflows/reuse.yml
-  run-it-single:
-    uses: ./.github/workflows/reuse.yml
-    with:
-      os: '["ubuntu-latest"]'

@@ -11,6 +11,8 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  CGO_ENABLED: 0
 
 jobs:
   release_default:
