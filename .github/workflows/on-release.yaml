@@ -10,6 +10,11 @@ on:
         default: 'linux,darwin'
         required: false
         type: string
+      go_version:
+        required: false
+        type: string
+        default: '1.21'
+        description: "Version of Go which should be used to perform the checks"
 
 env:
   OS_MAPPING: | 
@@ -42,5 +47,8 @@ jobs:
         os: ${{ fromJSON(needs.resolve-config.outputs.os) }}
     runs-on: ${{ matrix.os }}
     steps:
-      - name: "OS print"
-        run: "uname"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{inputs.go_version}}
+      - run: go env GOOS
