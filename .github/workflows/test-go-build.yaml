@@ -1,0 +1,11 @@
+name: "Call build-go"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  call:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build
+        uses: bactions/build-go@v0
