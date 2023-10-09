@@ -15,6 +15,12 @@ on:
         type: string
         default: '1.21'
         description: "Version of Go which should be used to perform the checks"
+      cgo_enabled:
+        required: false
+        type: boolean
+        default: false
+        description: "Should set the CGO_ENABLED env and the compilers"
+
 
 env:
   OS_MAPPING: | 
@@ -46,6 +52,8 @@ jobs:
       matrix:
         os: ${{ fromJSON(needs.resolve-config.outputs.os) }}
     runs-on: ${{ matrix.os }}
+    env:
+      CGO_ENABLED: ${{ inputs.cgo_enabled && '1' || '0' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v4

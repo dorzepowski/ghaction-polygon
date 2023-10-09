@@ -11,9 +11,6 @@ on:
       - main
   workflow_dispatch:
 
-env:
-  CGO_ENABLED: 0
-
 jobs:
   release_default:
     uses: ./.github/workflows/on-release.yaml
@@ -21,3 +18,4 @@ jobs:
     uses: ./.github/workflows/on-release.yaml
     with:
       os: 'linux'
+      cgo_enabled: true
