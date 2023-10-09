@@ -9,4 +9,11 @@ jobs:
     steps:
       - name: Build
         uses: bactions/build-go@v0
-      - run: echo $CGO_ENABLED
+      - name: Build CGO
+        uses: bactions/build-go@v0
+        env:
+          CGO_ENABLED: '1'
+      - name: Build No CGO
+        uses: bactions/build-go@v0
+        env:
+          CGO_ENABLED: '0'
