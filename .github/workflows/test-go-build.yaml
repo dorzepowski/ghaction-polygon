@@ -9,11 +9,3 @@ jobs:
     steps:
       - name: Build
         uses: bactions/build-go@v0
-      - name: Build CGO
-        uses: bactions/build-go@v0
-        env:
-          CGO_ENABLED: '1'
-      - name: Build No CGO
-        uses: bactions/build-go@v0
-        env:
-          CGO_ENABLED: '0'
