@@ -75,7 +75,7 @@ jobs:
       - name: Build
         uses: bactions/build-go@v0
         with:
-          go-version: ${{ inputs.go_version }}
+          go_version: ${{ inputs.go_version }}
           release_binaries: ${{ inputs.release_binaries }}
 
 
