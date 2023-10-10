@@ -11,9 +11,9 @@ on:
 jobs:
   release_default:
     uses: ./.github/workflows/on-release.yaml
-  release_single:
-    uses: ./.github/workflows/on-release.yaml
-    with:
-      os: 'linux'
-      cgo_enabled: true
-      release_binaries: false
+#  release_single:
+#    uses: ./.github/workflows/on-release.yaml
+#    with:
+#      os: 'linux'
+#      cgo_enabled: true
+#      release_binaries: false
