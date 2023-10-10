@@ -6,9 +6,6 @@ on:
   push:
     tags:
       - 'v*'
-    # TODO remove
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:

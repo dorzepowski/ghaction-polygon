@@ -67,9 +67,9 @@ jobs:
     env:
       CGO_ENABLED: ${{ inputs.cgo_enabled && '1' || '0' }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v4
+      - name: Build
+        uses: bactions/build-go@v0
         with:
-          go-version: ${{inputs.go_version}}
+          go-version: ${{ inputs.go_version }}
 
 
