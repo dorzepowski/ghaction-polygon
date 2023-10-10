@@ -12,7 +12,7 @@ jobs:
   release_default:
     uses: ./.github/workflows/on-release.yaml
     with:
-      version: ${{ github.ref_type }}
+      version: ${{ github.ref_name }}
 #  release_single:
 #    uses: ./.github/workflows/on-release.yaml
 #    with:
