@@ -20,6 +20,11 @@ on:
         type: boolean
         default: false
         description: "Should set the CGO_ENABLED env and the compilers"
+      release_binaries:
+        required: false
+        type: boolean
+        default: true
+        description: "If the packages with binaries should be attached to release"
 
 
 env:
@@ -71,5 +76,6 @@ jobs:
         uses: bactions/build-go@v0
         with:
           go-version: ${{ inputs.go_version }}
+          release_binaries: ${{ inputs.release_binaries }}
 
 

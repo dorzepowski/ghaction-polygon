@@ -16,3 +16,4 @@ jobs:
     with:
       os: 'linux'
       cgo_enabled: true
+      release_binaries: false
