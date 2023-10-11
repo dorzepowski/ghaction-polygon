@@ -46,6 +46,13 @@ jobs:
       os: ${{ steps.os.outputs.result }}
       workflow: ${{ steps.workflow.outputs.result }}
     steps:
+      - id: event
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const push_tag = '${{ github.event }}'
+            console.log(push_tag)
+            return ''
       - id: os
         uses: actions/github-script@v6
         with:
@@ -95,3 +102,12 @@ jobs:
           dist/${{ github.event.repository.name }}*.tar.gz \
           dist/${{ github.event.repository.name }}*_checksums.txt \
           --clobber
+
+  dockerize:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download binaries
+
