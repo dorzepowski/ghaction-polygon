@@ -111,7 +111,7 @@ jobs:
             const registry = isDockerhub ? '' : inputRegistry
             const organisation = '${{ inputs.docker_org || vars.DOCKER_ORG || secrets.DOCKER_USERNAME || github.repository_owner }}'
             const imageName = '${{ inputs.docker_image_name || vars.DOCKER_IMAGE_NAME || github.event.repository.name }}'            
-            const username = '${{ secrets.DOCKER_USERNAME || github.actor }}'
+            const username = '${{ secrets.DOCKER_USERNAME || github.repository_owner }}'
             const password = '${{ secrets.DOCKER_PASSWORD }}'
             const ghToken = '${{ github.token }}'
             return {
@@ -125,7 +125,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ steps.resolve-docker.outputs.result.image }}
+          images: ${{ fromJSON(steps.resolve-docker.outputs.result).image }}
           tags: |
             type=semver,pattern=v{{version}}
             type=semver,pattern=v{{major}}.{{minor}}
