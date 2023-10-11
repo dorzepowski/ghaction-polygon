@@ -119,6 +119,6 @@ jobs:
                 registry: registry
             }
       - name: Show the docker setup
-        run: echo "${{ steps.resolve-docker.outputs.docker }}"
+        run: echo "${{ steps.resolve-docker.outputs.result }}"
 
       
