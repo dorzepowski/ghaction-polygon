@@ -45,6 +45,7 @@ jobs:
     outputs:
       os: ${{ steps.os.outputs.result }}
       workflow: ${{ steps.workflow.outputs.result }}
+      docker: ${{ steps.docker.outputs.result }}
     steps:
       - id: os
         uses: actions/github-script@v6
@@ -66,8 +67,25 @@ jobs:
               repo_name: parts[1],
               file: parts.slice(2).join('/')
             }
-              
-
+      - id: docker
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const image = '${{ inputs.docker_image }}'
+            const inputRegistry = '${{ inputs.docker_registry }}' 
+            const isDockerhub = inputRegistry == 'dockerhub'
+            const registry = isDockerhub ? '' : inputRegistry
+            const organisation = '${{ inputs.docker_org || vars.DOCKER_ORG || secrets.DOCKER_USERNAME || github.repository_owner }}'
+            const imageName = '${{ inputs.docker_image_name || vars.DOCKER_IMAGE_NAME || github.event.repository.name }}'            
+            const username = '${{ secrets.DOCKER_USERNAME }}'
+            const password = '${{ secrets.DOCKER_PASSWORD }}'
+            const ghToken = '${{ github.token }}'
+            return {
+                image: image || `${registry ? registry + '/' : ''}${organisation}/${imageName}`,
+                username: username,
+                password: password ? password : !isDockerhub ? ghToken : '',
+                registry: registry
+            }
   build:
     needs: [resolve-config]
     strategy:
@@ -97,9 +115,10 @@ jobs:
           --clobber
 
   dockerize:
-    needs: [build]
+    needs: [resolve-config, build]
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Show the docker setup
+        run: echo "${{ needs.resolve-config.outputs.docker }}"
 
+      

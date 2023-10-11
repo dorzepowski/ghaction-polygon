@@ -3,3 +3,5 @@
 keys/
 events/
 .secrets
+artifacts/
+.github/workflows/*local.yml
