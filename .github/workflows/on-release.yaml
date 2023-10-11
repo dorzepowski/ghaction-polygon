@@ -162,7 +162,8 @@ jobs:
           && tar -xvzf dist/bin/${{ github.event.repository.name }}_*_amd64.tar.gz -C dist/linux/amd64 \
           || echo "archive amd64 not found" 
 
-      - id: resolve-docker
+      - name: Resolve docker configuration
+        id: resolve-docker
         uses: actions/github-script@v6
         with:
           script: |
@@ -226,3 +227,25 @@ jobs:
             src_url=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.source'] }}
             version=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
             revision=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
+           
+
+      - name: Prepare dockerhub README context
+        if: success() && fromJSON(steps.resolve-docker.outputs.result).isDockerhub && false
+        run: |
+          echo "DOCKER_IMAGE=${{ fromJSON(steps.resolve-docker.outputs.result).image }}" >> $GITHUB_ENV
+          echo "VERSION=${{ env.DOCKER_META_VERSION }}"" >> $GITHUB_ENV
+
+      - name: Prepare README for dockerhub
+        if: success() && fromJSON(steps.resolve-docker.outputs.result).isDockerhub && false
+        run: |
+          envsubst < ./release/README.DOCKER.md > ./dist/README.DOCKER.md
+
+      - name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v3
+        if: success() && fromJSON(steps.resolve-docker.outputs.result).isDockerhub && false
+        with:
+          username: ${{ fromJSON(steps.resolve-docker.outputs.result).username }}
+          password: ${{ fromJSON(steps.resolve-docker.outputs.result).password }}
+          short-description: ${{ github.event.repository.description }}
+          repository: ${{ fromJSON(steps.resolve-docker.outputs.result).image }}
+          readme-filepath: ./dist/README.DOCKER.md
