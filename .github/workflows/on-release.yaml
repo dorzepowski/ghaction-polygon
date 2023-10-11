@@ -29,8 +29,45 @@ on:
         type: boolean
         default: true
         description: "If the packages with binaries should be attached to release"
+      docker_image:
+        required: false
+        type: string
+        description: |
+          Set whole docker image name and should be in pattern: {registry}/{organisation}/{image_name} 
+          where registry can be omitted if this should be dockerhub registry
+          takes precedence over other options.
+      docker_registry:
+        required: false
+        type: string
+        default: 'dockerhub'
+        description: "Set registry for docker image. Defaults to dockerhub."
+      docker_org:
+        required: false
+        type: string
+        description: |
+          Set organisation docker image.
+          Equivalent of variable DOCKER_ORG.
+          If not set then defaults to secret DOCKER_USERNAME.
+          If secret DOCKER_USERNAME is not set, then defaults to GitHub repository owner (organisation)
+      docker_image_name:
+        required: false
+        type: string
+        description: |
+          Set name of docker image.
+          Equivalent of variable DOCKER_IMAGE_NAME.
+          If not set, then defaults to then defaults to GitHub repository name.
+    secrets:
+      DOCKER_USERNAME:
+        required: false
+        description: |
+          Username of docker repository.
+          If not set, then defaults to GitHub repository owner (organisation)
 
-
+      DOCKER_PASSWORD:
+        required: false
+        description: |
+          Password used to authenticate in docker repository.
+          If is not set, and registry is ghcr.io, then defaults to GitHub Token.
 env:
   OS_MAPPING: | 
     {
@@ -108,6 +145,7 @@ jobs:
             const image = '${{ inputs.docker_image }}'
             const inputRegistry = '${{ inputs.docker_registry }}' 
             const isDockerhub = inputRegistry == 'dockerhub'
+            const isGhcr = inputRegistry == 'ghcr.io'
             const registry = isDockerhub ? '' : inputRegistry
             const organisation = '${{ inputs.docker_org || vars.DOCKER_ORG || secrets.DOCKER_USERNAME || github.repository_owner }}'
             const imageName = '${{ inputs.docker_image_name || vars.DOCKER_IMAGE_NAME || github.event.repository.name }}'            
@@ -117,8 +155,10 @@ jobs:
             return {
                 image: image || `${registry ? registry + '/' : ''}${organisation}/${imageName}`,
                 username: username,
-                password: password ? password : !isDockerhub ? ghToken : '',
-                registry: registry
+                password: password ? password : isGhcr ? ghToken : '',
+                registry: registry,
+                isDockerhub: isDockerhub,
+                isGhcr: isGhcr
             }
 
       - name: Docker meta

@@ -13,6 +13,8 @@ jobs:
     uses: ./.github/workflows/on-release.yaml
     with:
       version: ${{ github.ref_name }}
+      registry: ghcr.io
+
 #  release_single:
 #    uses: ./.github/workflows/on-release.yaml
 #    with:
