@@ -50,7 +50,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const push_tag = '${{ github.event }}'
+            const push_tag = '${{ toJSON(github.event) }}'
             console.log(push_tag)
             return ''
       - id: os
