@@ -197,7 +197,7 @@ jobs:
             type=semver,pattern=v{{major}}
             type=semver,pattern=v{{version}}
           labels: |
-            ${{ fromJSON(steps.resolve-docker.outputs.result).isDockerhub && 'org.opencontainers.image.url="https://hub.docker.com/r/"' + fromJSON(steps.resolve-docker.outputs.result).image }}
+            ${{ fromJSON(steps.resolve-docker.outputs.result).isDockerhub && format('org.opencontainers.image.url="https://hub.docker.com/r/{0}"', fromJSON(steps.resolve-docker.outputs.result).image) }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
