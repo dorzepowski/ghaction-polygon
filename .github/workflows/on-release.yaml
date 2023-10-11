@@ -109,7 +109,7 @@ jobs:
             const registry = isDockerhub ? '' : inputRegistry
             const organisation = '${{ inputs.docker_org || vars.DOCKER_ORG || secrets.DOCKER_USERNAME || github.repository_owner }}'
             const imageName = '${{ inputs.docker_image_name || vars.DOCKER_IMAGE_NAME || github.event.repository.name }}'            
-            const username = '${{ secrets.DOCKER_USERNAME }}'
+            const username = '${{ secrets.DOCKER_USERNAME || github.actor }}'
             const password = '${{ secrets.DOCKER_PASSWORD }}'
             const ghToken = '${{ github.token }}'
             return {
