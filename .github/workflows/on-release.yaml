@@ -125,7 +125,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ steps.resolve-docker.outputs.result.registry.image }}
+          images: ${{ steps.resolve-docker.outputs.result.image }}
           tags: |
             type=semver,pattern=v{{version}}
             type=semver,pattern=v{{major}}.{{minor}}
