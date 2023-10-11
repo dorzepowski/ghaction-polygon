@@ -46,13 +46,6 @@ jobs:
       os: ${{ steps.os.outputs.result }}
       workflow: ${{ steps.workflow.outputs.result }}
     steps:
-      - id: event
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const push_tag = ${{ toJSON(github.event) }}
-            console.log(push_tag)
-            return ''
       - id: os
         uses: actions/github-script@v6
         with:
