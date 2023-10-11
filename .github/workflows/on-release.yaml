@@ -1,6 +1,7 @@
 name: On Release
 permissions:
   contents: write
+  packages: write
 
 on:
   workflow_call:
