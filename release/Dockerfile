@@ -9,6 +9,7 @@ ARG project_name
 COPY ./dist/$TARGETPLATFORM .
 
 ARG version
+ARG tag
 ENV APP_BINARY=${project_name}
 ENV VERSION=${version:-develop}
 ENV TAG=${tag:-master}
