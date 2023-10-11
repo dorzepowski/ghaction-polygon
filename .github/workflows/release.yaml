@@ -14,7 +14,7 @@ jobs:
     uses: ./.github/workflows/on-release.yaml
     with:
       version: ${{ github.ref_name }}
-#      docker_registry: ghcr.io
+    secrets: inherit
 
 #  release_single:
 #    uses: ./.github/workflows/on-release.yaml
