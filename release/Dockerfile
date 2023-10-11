@@ -6,6 +6,7 @@ WORKDIR /app
 
 COPY ./release/entrypoint.sh .
 ARG project_name
+ARG TARGETPLATFORM
 COPY ./dist/$TARGETPLATFORM .
 
 ARG version
