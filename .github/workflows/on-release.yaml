@@ -141,9 +141,9 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          registry: ${{ steps.resolve-docker.outputs.result.registry }}
-          username: ${{ steps.resolve-docker.outputs.result.username }}
-          password: ${{ steps.resolve-docker.outputs.result.password }}
+          registry: ${{ fromJSON(steps.resolve-docker.outputs.result).registry }}
+          username: ${{ fromJSON(steps.resolve-docker.outputs.result).username }}
+          password: ${{ fromJSON(steps.resolve-docker.outputs.result).password }}
 
       - name: Build and push
         uses: docker/build-push-action@v5
