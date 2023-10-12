@@ -285,7 +285,7 @@ jobs:
     env:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       REPO_URL: ${{github.server_url}}/${{ github.repository }}
-      RELEASE_URL: ${{github.server_url}}/${{ github.repository }}/release/tag/${{ input.version }}
+      RELEASE_URL: ${{github.server_url}}/${{ github.repository }}/release/tag/${{ inputs.version }}
     steps:
       - name: "Slack notification is skipped because secret SLACK_WEBHOOK_URL is not set"
         if: ${{ env.SLACK_WEBHOOK_URL == '' }}
