@@ -264,8 +264,8 @@ jobs:
       - name: Encoded outputs
         id: encoded-outputs
         run: |
-          echo "DOCKER_IMAGE_ENCODED=$(echo "$DOCKER_IMAGE" | base64 )" >> $GITHUB_ENV
-          echo "DOCKER_IMAGE_HTML_ENCODED=$(echo "$DOCKER_IMAGE_HTML" | base64 )" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_ENCODED=$(echo "$DOCKER_IMAGE" | base64 -w0 | base64 -w0 )" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_HTML_ENCODED=$(echo "$DOCKER_IMAGE_HTML" | base64 -w0 | base64 -w0 )" >> $GITHUB_ENV
       - name: Choose dockerhub readme file template
         if: success() && fromJSON(steps.resolve-docker.outputs.result).isDockerhub
         run: |
@@ -288,10 +288,18 @@ jobs:
           repository: ${{ fromJSON(steps.resolve-docker.outputs.result).image }}
           readme-filepath: ./dist/README.DOCKER.md
 
+  publish-release:
+    name: Publish Release
+    runs-on: ubuntu-latest
+    needs: [dockerize]
+    steps:
+      - name: Publish
+        run: |
+          gh release edit ${{ inputs.version }} --draft=false
   notify:
     name: "Notify"
     runs-on: ubuntu-latest
-    needs: [dockerize]
+    needs: [dockerize, publish-release]
     env:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       REPO_URL: ${{github.server_url}}/${{ github.repository }}
@@ -310,8 +318,8 @@ jobs:
       - name: "Decode docker outputs"
         if: env.DOCKER_IMAGE == '' || env.DOCKER_IMAGE_HTML == ''
         run: |
-          echo "DOCKER_IMAGE=$(echo ${{ needs.dockerize.outputs.image_encoded }} | base64 -D)" >> >> $GITHUB_ENV
-          echo "DOCKER_IMAGE_HTML=$(echo ${{ needs.dockerize.outputs.html_encoded }} | base64 -D)" >> >> $GITHUB_ENV
+          echo "DOCKER_IMAGE=$(echo ${{ needs.dockerize.outputs.image_encoded }} | base64 -di | base64 -di)" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_HTML=$(echo ${{ needs.dockerize.outputs.html_encoded }} | base64 -di | base64 -di)" >> $GITHUB_ENV
 
       - name: "Notify successful release"
         if: ${{ env.SLACK_WEBHOOK_URL != '' }}
