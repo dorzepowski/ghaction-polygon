@@ -233,8 +233,10 @@ jobs:
         if: success() && fromJSON(steps.resolve-docker.outputs.result).isDockerhub
         run: |
           echo "DOCKER_IMAGE=${{ fromJSON(steps.resolve-docker.outputs.result).image }}" >> $GITHUB_ENV
-          echo "VERSION=${{ env.DOCKER_META_VERSION }}" >> $GITHUB_ENV
-          echo "DOCKER_README_FILE=$([ -f ./release/README.DOCKER.md ] && echo './release/README.DOCKER.md' || { [ -f ./README.md ] && echo "./README.md" || echo '' })" >> $GITHUB_ENV
+          echo "VERSION=${{ env.DOCKER_METADATA_OUTPUT_VERSION }}" >> $GITHUB_ENV
+          readmeFile=$([ -f ./README.md ] && echo "./README.md" || echo '')
+          readmeFile=$([ -f ./release/README.DOCKER.md ] && echo './release/README.DOCKER.md' || echo $readmeFile)
+          echo "DOCKER_README_FILE=$readmeFile" >> $GITHUB_ENV
 
       - name: Prepare README for dockerhub
         if: success() && fromJSON(steps.resolve-docker.outputs.result).isDockerhub && env.DOCKER_README_FILE != ''
