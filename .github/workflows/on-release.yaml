@@ -106,6 +106,7 @@ jobs:
             }
 
   build:
+    name: Build binaries
     needs: [resolve-config]
     strategy:
       matrix:
@@ -134,6 +135,7 @@ jobs:
           --clobber
 
   dockerize:
+    name: Dockerize
     needs: [build]
     runs-on: ubuntu-latest
     steps:
@@ -167,23 +169,41 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const image = '${{ inputs.docker_image }}'
-            const inputRegistry = '${{ inputs.docker_registry }}' 
-            const isDockerhub = inputRegistry == 'dockerhub'
-            const isGhcr = inputRegistry == 'ghcr.io'
-            const registry = isDockerhub ? '' : inputRegistry
-            const organisation = '${{ inputs.docker_org || vars.DOCKER_ORG || secrets.DOCKER_USERNAME || github.repository_owner }}'
-            const imageName = '${{ inputs.docker_image_name || vars.DOCKER_IMAGE_NAME || github.event.repository.name }}'            
+            let image = '${{ inputs.docker_image }}'
+            let registry
+            let organisation
+            let imageName
+            if(image) {
+                const parts = image.split('/')
+                registry = parts.length === 3 ? parts[0] : 'dockerhub'
+                organisation = parts.length === 3 ? parts[1] : parts[0]
+                imageName = parts.length === 3 ? parts[2] : parts[1]
+            } else {
+                registry = "${{ inputs.docker_registry || 'dockerhub' }}"
+                organisation = '${{ inputs.docker_org || vars.DOCKER_ORG || secrets.DOCKER_USERNAME || github.repository_owner }}'
+                imageName = '${{ inputs.docker_image_name || vars.DOCKER_IMAGE_NAME || github.event.repository.name }}'
+                image = `${registry !== 'dockerhub' ? registry + '/' : ''}${organisation}/${imageName}`
+            }
+            const isDockerhub = registry === 'dockerhub'
+            const isGhcr = registry === 'ghcr.io'
             const username = '${{ secrets.DOCKER_USERNAME || github.repository_owner }}'
             const password = '${{ secrets.DOCKER_PASSWORD }}'
             const ghToken = '${{ github.token }}'
+            let dockerImageHtml=''
+            if(isDockerhub) {
+                dockerImageHtml = `https://hub.docker.com/r/${image}`
+            } else if(isGhcr) {
+                dockerImageHtml = `https://github.com/${organisation}/${imageName}/pkgs/container/${imageName}`
+            }   
+            
             return {
-                image: image || `${registry ? registry + '/' : ''}${organisation}/${imageName}`,
+                image: image,
                 username: username,
                 password: password ? password : isGhcr ? ghToken : '',
-                registry: registry,
-                isDockerhub: isDockerhub,
-                isGhcr: isGhcr
+                registry: isDockerhub ? '' : registry,
+                isDockerhub,
+                isGhcr,
+                dockerImageHtml
             }
 
       - name: Docker meta
@@ -227,13 +247,14 @@ jobs:
             src_url=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.source'] }}
             version=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
             revision=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
-           
 
-      - name: Prepare dockerhub README context
-        if: success() && fromJSON(steps.resolve-docker.outputs.result).isDockerhub
+      - name: Add additional variables to env
         run: |
           echo "DOCKER_IMAGE=${{ fromJSON(steps.resolve-docker.outputs.result).image }}" >> $GITHUB_ENV
           echo "VERSION=${{ env.DOCKER_METADATA_OUTPUT_VERSION }}" >> $GITHUB_ENV
+      - name: Choose dockerhub readme file template
+        if: success() && fromJSON(steps.resolve-docker.outputs.result).isDockerhub
+        run: |
           readmeFile=$([ -f ./README.md ] && echo "./README.md" || echo '')
           readmeFile=$([ -f ./release/README.DOCKER.md ] && echo './release/README.DOCKER.md' || echo $readmeFile)
           echo "DOCKER_README_FILE=$readmeFile" >> $GITHUB_ENV
@@ -243,10 +264,6 @@ jobs:
         run: |
           envsubst < $DOCKER_README_FILE > ./dist/README.DOCKER.md
 
-      - name: debug
-        if: success() && env.DOCKER_README_FILE != ''
-        run:
-          cat ./dist/README.DOCKER.md
       - name: Docker Hub Description
         uses: peter-evans/dockerhub-description@v3
         if: success() && env.DOCKER_README_FILE != ''
@@ -256,3 +273,51 @@ jobs:
           short-description: ${{ github.event.repository.description }}
           repository: ${{ fromJSON(steps.resolve-docker.outputs.result).image }}
           readme-filepath: ./dist/README.DOCKER.md
+
+  notify:
+    name: "Notify"
+    runs-on: ubuntu-latest
+    needs: [dockerize]
+    if: false
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      REPO_URL: ${{github.server_url}}/${{ github.repository }}
+      RELEASE_URL: ${{ env.REPO_URL }}/release/tag/${{ input.version }}
+    steps:
+      - name: "Slack notification is skipped because secret SLACK_WEBHOOK_URL is not set"
+        if: ${{ env.SLACK_WEBHOOK_URL == '' }}
+        run: echo "::notice::Slack notification is skipped because secret SLACK_WEBHOOK_URL is not set"
+
+      - name: "Notify successful release"
+        if: ${{ env.SLACK_WEBHOOK_URL != '' }}
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "block_id": "release",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*bux-cli* <${{ env.RELEASE_URL }}|${{ ${{ input.version }}> is out! :rocket:"
+                  }
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {
+                      "type": "image",
+                      "image_url": "https://www.docker.com/favicon.ico",
+                      "alt_text": "docker"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "Docker image <https://hub.docker.com/r/4chainstudio/ghaction-polygon|4chainstudio/ghaction-polygon:v3.10.0> pushed!"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
