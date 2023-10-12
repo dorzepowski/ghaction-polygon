@@ -230,7 +230,7 @@ jobs:
            
 
       - name: Prepare dockerhub README context
-        if: success() && fromJSON(steps.resolve-docker.outputs.result).isDockerhub && false
+        if: success() && fromJSON(steps.resolve-docker.outputs.result).isDockerhub
         run: |
           echo "DOCKER_IMAGE=${{ fromJSON(steps.resolve-docker.outputs.result).image }}" >> $GITHUB_ENV
           echo "VERSION=${{ env.DOCKER_META_VERSION }}"" >> $GITHUB_ENV
@@ -242,7 +242,7 @@ jobs:
           envsubst < $DOCKER_README_FILE > ./dist/README.DOCKER.md
 
       - name: debug
-        if: success() && fromJSON(steps.resolve-docker.outputs.result).isDockerhub
+        if: success() && fromJSON(steps.resolve-docker.outputs.result).isDockerhub && env.DOCKER_README_FILE != ''
         run:
           cat ./dist/README.DOCKER.md
       - name: Docker Hub Description
