@@ -244,12 +244,12 @@ jobs:
           envsubst < $DOCKER_README_FILE > ./dist/README.DOCKER.md
 
       - name: debug
-        if: success() && fromJSON(steps.resolve-docker.outputs.result).isDockerhub && env.DOCKER_README_FILE != ''
+        if: success() && env.DOCKER_README_FILE != ''
         run:
           cat ./dist/README.DOCKER.md
       - name: Docker Hub Description
         uses: peter-evans/dockerhub-description@v3
-        if: success() && fromJSON(steps.resolve-docker.outputs.result).isDockerhub && false
+        if: success() && env.DOCKER_README_FILE != ''
         with:
           username: ${{ fromJSON(steps.resolve-docker.outputs.result).username }}
           password: ${{ fromJSON(steps.resolve-docker.outputs.result).password }}
