@@ -138,6 +138,10 @@ jobs:
     name: Dockerize
     needs: [build]
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ env.VERSION }}
+      image: ${{ env.DOCKER_IMAGE }}
+      html: ${{ fromJSON(steps.resolve-docker.outputs.result).html }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -278,11 +282,10 @@ jobs:
     name: "Notify"
     runs-on: ubuntu-latest
     needs: [dockerize]
-    if: false
     env:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       REPO_URL: ${{github.server_url}}/${{ github.repository }}
-      RELEASE_URL: ${{ env.REPO_URL }}/release/tag/${{ input.version }}
+      RELEASE_URL: ${{github.server_url}}/${{ github.repository }}/release/tag/${{ input.version }}
     steps:
       - name: "Slack notification is skipped because secret SLACK_WEBHOOK_URL is not set"
         if: ${{ env.SLACK_WEBHOOK_URL == '' }}
@@ -300,7 +303,7 @@ jobs:
                   "block_id": "release",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*bux-cli* <${{ env.RELEASE_URL }}|${{ ${{ input.version }}> is out! :rocket:"
+                    "text": "*bux-cli* <${{ env.RELEASE_URL }}|${{ inputs.version }}> is out! :rocket:"
                   }
                 },
                 {
@@ -313,7 +316,7 @@ jobs:
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "Docker image <https://hub.docker.com/r/4chainstudio/ghaction-polygon|4chainstudio/ghaction-polygon:v3.10.0> pushed!"
+                      "text": "Docker image <${{ needs.dockerize.outputs.html }}|${{ needs.dockerize.outputs.image }}:${{ needs.dockerize.outputs.version }}> pushed!"
                     }
                   ]
                 }
