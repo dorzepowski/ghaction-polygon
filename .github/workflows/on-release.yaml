@@ -141,7 +141,9 @@ jobs:
     outputs:
       version: ${{ env.VERSION }}
       image: ${{ env.DOCKER_IMAGE }}
-      html: ${{ fromJSON(steps.resolve-docker.outputs.result).html }}
+      image_encoded: ${{ env.DOCKER_IMAGE_ENCODED }}
+      html: ${{ env.DOCKER_IMAGE_HTML }}
+      html_encoded: ${{ env.DOCKER_IMAGE_HTML_ENCODED }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -256,6 +258,14 @@ jobs:
         run: |
           echo "DOCKER_IMAGE=${{ fromJSON(steps.resolve-docker.outputs.result).image }}" >> $GITHUB_ENV
           echo "VERSION=${{ env.DOCKER_METADATA_OUTPUT_VERSION }}" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_HTML=${{ fromJSON(steps.resolve-docker.outputs.result).html }}" >> $GITHUB_ENV
+
+      ### Solve the issue when part of image name is resolved as secret.DOCKER_USERNAME
+      - name: Encoded outputs
+        id: encoded-outputs
+        run: |
+          echo "DOCKER_IMAGE_ENCODED=$(echo "$DOCKER_IMAGE" | base64 )" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_HTML_ENCODED=$(echo "$DOCKER_IMAGE_HTML" | base64 )" >> $GITHUB_ENV
       - name: Choose dockerhub readme file template
         if: success() && fromJSON(steps.resolve-docker.outputs.result).isDockerhub
         run: |
@@ -291,6 +301,18 @@ jobs:
         if: ${{ env.SLACK_WEBHOOK_URL == '' }}
         run: echo "::notice::Slack notification is skipped because secret SLACK_WEBHOOK_URL is not set"
 
+      - name: "Resolve docker outputs"
+        run: |
+          echo "DOCKER_IMAGE=${{ needs.dockerize.outputs.image }}" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_HTML=${{ needs.dockerize.outputs.html }}" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_VERSION=${{ needs.dockerize.outputs.version }}" >> $GITHUB_ENV
+
+      - name: "Decode docker outputs"
+        if: env.DOCKER_IMAGE == '' || env.DOCKER_IMAGE_HTML == ''
+        run: |
+          echo "DOCKER_IMAGE=$(echo ${{ needs.dockerize.outputs.image_encoded }} | base64 -D)" >> >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_HTML=$(echo ${{ needs.dockerize.outputs.html_encoded }} | base64 -D)" >> >> $GITHUB_ENV
+
       - name: "Notify successful release"
         if: ${{ env.SLACK_WEBHOOK_URL != '' }}
         uses: slackapi/slack-github-action@v1.24.0
@@ -316,7 +338,7 @@ jobs:
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "Docker image <${{ needs.dockerize.outputs.html }}|${{ needs.dockerize.outputs.image }}:${{ needs.dockerize.outputs.version }}> pushed!"
+                      "text": "Docker image <${{ env.DOCKER_IMAGE_HTML }}|${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_IMAGE_VERSION }}> pushed!"
                     }
                   ]
                 }
