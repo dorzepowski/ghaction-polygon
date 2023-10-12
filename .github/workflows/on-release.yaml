@@ -75,7 +75,7 @@ env:
       'darwin': 'macos-latest',
       'linux': 'ubuntu-latest'
     }
-    
+  GH_TOKEN: ${{ github.token }}
 
 jobs:
   resolve-config:
@@ -114,7 +114,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       CGO_ENABLED: ${{ inputs.cgo_enabled && '1' || '0' }}
-      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Build
         uses: bactions/build-go@v0
@@ -296,6 +295,7 @@ jobs:
       - name: Publish
         run: |
           gh release edit ${{ inputs.version }} --draft=false
+
   notify:
     name: "Notify"
     runs-on: ubuntu-latest
