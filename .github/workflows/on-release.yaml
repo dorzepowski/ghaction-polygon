@@ -294,7 +294,7 @@ jobs:
     steps:
       - name: Publish
         run: |
-          gh release edit ${{ inputs.version }} --draft=false
+          gh release edit ${{ inputs.version }} --draft=false --repo ${{ github.repository }}
 
   notify:
     name: "Notify"
