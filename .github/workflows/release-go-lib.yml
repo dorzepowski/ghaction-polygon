@@ -41,7 +41,7 @@ jobs:
       - name: Syndicate to GoDocs
         run: |
           echo "syndicating to GoDocs..."
-          curl "https://proxy.golang.org/github.com/${{ github.repository }}/v/${{ inputs.version }}/info"
+          curl "https://proxy.golang.org/github.com/${{ github.repository }}/@v/${{ inputs.version }}.info"
 
       - name: "Notify successful release"
         if: ${{ env.SLACK_WEBHOOK_URL != '' }}
