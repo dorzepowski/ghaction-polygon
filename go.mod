@@ -1,4 +1,4 @@
-module 4chain-ag/ghaction-polygon/v3
+module 4chain-ag/ghaction-polygon/v4
 
 go 1.20
 
