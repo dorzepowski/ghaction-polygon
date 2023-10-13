@@ -7,18 +7,10 @@ on:
   push:
     tags:
       - 'v*'
-  workflow_dispatch:
 
 jobs:
   release_default:
-    uses: ./.github/workflows/on-release.yaml
+    uses: bactions/workflows/.github/workflows/release-go-server.yaml@main
     with:
       version: ${{ github.ref_name }}
     secrets: inherit
-
-#  release_single:
-#    uses: ./.github/workflows/on-release.yaml
-#    with:
-#      os: 'linux'
-#      cgo_enabled: true
-#      release_binaries: false
