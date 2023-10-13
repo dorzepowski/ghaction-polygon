@@ -10,7 +10,7 @@ on:
 
 jobs:
   release_default:
-    uses: ./.github/workflows/release-go-lib.yaml
+    uses: ./.github/workflows/release-go-lib.yml
     with:
       version: ${{ github.ref_name }}
     secrets:
