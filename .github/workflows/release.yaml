@@ -13,4 +13,6 @@ jobs:
     uses: bactions/workflows/.github/workflows/release-go-server.yaml@main
     with:
       version: ${{ github.ref_name }}
-    secrets: inherit
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
