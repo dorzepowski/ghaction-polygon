@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   on-push:
-    uses: bactions/workflows/.github/workflows/on-push.yml@main
+    uses: bactions/workflows/.github/workflows/on-push-go.yml@main
     secrets:
       deploy_key: ${{ secrets.RELEASE_KEY }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
