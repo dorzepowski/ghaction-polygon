@@ -10,7 +10,7 @@ on:
 
 jobs:
   release_default:
-    uses: bactions/workflows/.github/workflows/release-go-lib.yml
+    uses: bactions/workflows/.github/workflows/release-go-lib.yml@main
     with:
       version: ${{ github.ref_name }}
     secrets:
