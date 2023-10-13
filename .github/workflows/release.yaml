@@ -10,10 +10,10 @@ on:
 
 jobs:
   release_default:
-    uses: bactions/workflows/.github/workflows/release-go-server.yaml@main
+    uses: ./.github/workflows/release-go-lib.yaml
     with:
       version: ${{ github.ref_name }}
     secrets:
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-#      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      #      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      #      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

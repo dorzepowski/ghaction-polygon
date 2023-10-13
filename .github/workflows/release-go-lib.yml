@@ -68,7 +68,7 @@ jobs:
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "Go library <${{ env.DOCKER_IMAGE_HTML }}|${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_IMAGE_VERSION }}> !"
+                      "text": "Go package documentation for <https://pkg.go.dev/github.com/${{ github.repository }}|${{ github.event.repository.name || github.repository }}> was updated!"
                     }
                   ]
                 }
