@@ -11,7 +11,7 @@ jobs:
   release_default:
     uses: bactions/workflows/.github/workflows/release-go-server.yml@norelease
     with:
-      version: 218c88a
+      version: ${{ inputs.ref }}
       os: linux
       cgo_enabled: true
       release_binaries: false
