@@ -2,7 +2,11 @@ name: Release
 
 on:
   workflow_dispatch:
-  
+    inputs:
+      ref:
+        description: 'Git ref to checkout'
+        required: true
+        default: 'main'
 jobs:
   release_default:
     uses: bactions/workflows/.github/workflows/release-go-server.yml@norelease
