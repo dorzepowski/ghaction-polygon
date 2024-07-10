@@ -2,6 +2,7 @@ package main
 
 import (
 	"4chain-ag/ghaction-polygon/api"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,10 +20,19 @@ import (
 //	@license.name	Apache 2.0
 //	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
 
-//	@host		petstore.swagger.io
-//	@BasePath	/v2
+// @host		petstore.swagger.io
+// @BasePath	/v2
+var version = "develop"
 
 func main() {
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
+	fmt.Println("Version:", version)
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
 	r := gin.New()
 	r.GET("/testapi/get-string-by-int/:some_id", api.GetStringByInt)
 	r.GET("//testapi/get-struct-array-by-string/:some_id", api.GetStructArrayByString)
