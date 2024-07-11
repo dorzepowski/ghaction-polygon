@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - meta
     tags:
       - 'v*'
 
@@ -39,4 +40,4 @@ jobs:
           flavor: latest=true
       - name: Print Docker metadata outputs
         run: |
-          echo "metadata: ${{ toJson(steps.meta.outputs) }}"
+          echo $DOCKER_METADATA_OUTPUT_JSON | jq -r '"metadata: ",.'
