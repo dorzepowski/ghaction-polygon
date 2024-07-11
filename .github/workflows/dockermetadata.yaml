@@ -1,0 +1,40 @@
+name: Test Docker Metadata
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  release_default:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve docker configuration
+        id: resolve-docker
+        uses: actions/github-script@v7
+        with:
+          script: |
+            return {
+                image: "4chainstudio/ghaction-polygon",
+                isDockerhub: true,
+                isGhcr: false,
+            }
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ fromJSON(steps.resolve-docker.outputs.result).image }}
+          tags: |
+            type=semver,pattern=v{{version}}
+            type=semver,pattern=v{{major}}.{{minor}}
+            type=semver,pattern=v{{major}}
+            type=semver,pattern={{raw}}
+          labels: |
+            ${{ fromJSON(steps.resolve-docker.outputs.result).isDockerhub && format('org.opencontainers.image.url="https://hub.docker.com/r/{0}"', fromJSON(steps.resolve-docker.outputs.result).image) }}
+          flavor: latest=true
+      - name: Print Docker metadata outputs
+        run: |
+          echo "metadata: ${{ toJson(steps.meta.outputs) }}"
