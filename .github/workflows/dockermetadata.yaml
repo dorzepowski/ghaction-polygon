@@ -35,9 +35,7 @@ jobs:
             type=semver,pattern=v{{major}}.{{minor}}
             type=semver,pattern=v{{major}}
             type=semver,pattern={{raw}}
+            type=raw,feat/spv-123_this_is_pretty_long_tag_and_it_should_be_truncated_below_128_chars_so_it_does_not_break_anything_when_pushed_to_docker_hub
           labels: |
             ${{ fromJSON(steps.resolve-docker.outputs.result).isDockerhub && format('org.opencontainers.image.url=https://hub.docker.com/r/{0}', fromJSON(steps.resolve-docker.outputs.result).image) }}
           flavor: latest=true
-      - name: Print Docker metadata outputs
-        run: |
-          echo $DOCKER_METADATA_OUTPUT_JSON | jq -r '"metadata: ",.'
