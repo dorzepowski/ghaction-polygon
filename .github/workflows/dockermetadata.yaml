@@ -96,12 +96,12 @@ jobs:
           context: git
           images: ${{ fromJSON(steps.resolve-docker.outputs.result).image }}
           tags: |
-            type=semver,pattern=v{{version}}
-            type=semver,pattern=v{{major}}.{{minor}}
-            type=semver,pattern=v{{major}}
-            type=semver,pattern={{raw}}
+            type=semver,pattern=v{{version}},enable=${{ needs.resolve-config.outputs.refType != 'sha' }}
+            type=semver,pattern=v{{major}}.{{minor}},enable=${{ needs.resolve-config.outputs.refType != 'sha' }}
+            type=semver,pattern=v{{major}},enable=${{ needs.resolve-config.outputs.refType != 'sha' }}
+            type=semver,pattern={{raw}},enable=${{ needs.resolve-config.outputs.refType != 'sha' }}
             type=raw,${{ needs.resolve-config.outputs.version }},enable=${{ inputs.enabled }}
-            type=sha,enable=${{ inputs.enabled }}
+            type=sha,enable=${{ needs.resolve-config.outputs.refType != 'sha' }}
           labels: |
             ${{ fromJSON(steps.resolve-docker.outputs.result).isDockerhub && format('org.opencontainers.image.url=https://hub.docker.com/r/{0}', fromJSON(steps.resolve-docker.outputs.result).image) }}
           flavor: latest=true
