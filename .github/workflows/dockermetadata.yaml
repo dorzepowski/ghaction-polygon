@@ -104,5 +104,5 @@ jobs:
             type=sha,enable=${{ needs.resolve-config.outputs.refType != 'sha' }}
           labels: |
             ${{ fromJSON(steps.resolve-docker.outputs.result).isDockerhub && format('org.opencontainers.image.url=https://hub.docker.com/r/{0}', fromJSON(steps.resolve-docker.outputs.result).image) }}
-          flavor: latest=true
+          flavor: latest=true,enable=${{ needs.resolve-config.outputs.refType == 'tag' }}
 
