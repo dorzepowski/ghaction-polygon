@@ -2,47 +2,76 @@ name: Test Docker Metadata
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-      - meta
-    tags:
-      - 'v*'
+    inputs:
+      version:
+        description: 'Version to release'
+        required: true
+        default: 'main'
+        type: string
+      ref:
+        description: 'Ref to release'
+        required: false
+        default: 'main'
+        type: string
+#  push:
+#    branches:
+#      - main
+#      - meta
+#    tags:
+#      - 'v*'
 
 jobs:
   release_default:
     runs-on: ubuntu-latest
     steps:
-      - name: Resolve docker configuration
-        id: resolve-docker
-        uses: actions/github-script@v7
-        with:
-          script: |
-            core.setOutput("myOutput", "success");
-            
-            return {
-                image: "4chainstudio/ghaction-polygon",
-                isDockerhub: true,
-                isGhcr: false,
-            }
-      - name: print debug
-        run: echo "${{ steps.resolve-docker.outputs.myOutput }}"
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
         with:
-          images: ${{ fromJSON(steps.resolve-docker.outputs.result).image }}
-          tags: |
-            type=semver,pattern=v{{version}}
-            type=semver,pattern=v{{major}}.{{minor}}
-            type=semver,pattern=v{{major}}
-            type=semver,pattern={{raw}}
-            type=raw,feat/spv-123_this_is_pretty_long_tag_and_it_should_be_truncated_below_128_chars_so_it_does_not_break_anything_when_pushed_to_docker_hub
-            type=ref,event=branch,prefix=evbranch-
-            type=ref,event=tag,prefix=evtag-
-            type=sha
-          labels: |
-            ${{ fromJSON(steps.resolve-docker.outputs.result).isDockerhub && format('org.opencontainers.image.url=https://hub.docker.com/r/{0}', fromJSON(steps.resolve-docker.outputs.result).image) }}
-          flavor: latest=true
+          ref: ${{ inputs.ref || inputs.version }}
+      - name: Resolve ref type
+        # check based on the git repository if the inputs.version is a tag or branch or sha
+        id: git-ref
+        run: |
+          echo "::set-output name=value::${{ inputs.ref || inputs.version }}"
+          type=$(git cat-file -t ${{ steps.resolve-ref.outputs.ref }})
+          if [[ "$type" == "tag" ]]; then
+            echo "::set-output name=type::tag"
+          elif [[ "$type" == "commit" && "$(git branch --show-current)" == "${{ steps.resolve-ref.outputs.ref }}" ]]; then
+            echo "::set-output name=type::branch"
+          else
+            echo "::set-output name=type::sha"
+          fi
+
+      - name: Print debug
+        run: |
+          echo "Ref: ${{ steps.ref-type.outputs.value }}"
+          echo "Type: ${{ steps.ref-type.outputs.type }}"
+
+#      - name: Resolve docker configuration
+#        id: resolve-docker
+#        uses: actions/github-script@v7
+#        with:
+#          script: |
+#            return {
+#                image: "4chainstudio/ghaction-polygon",
+#                isDockerhub: true,
+#                isGhcr: false,
+#            }
+#
+#      - name: Docker meta
+#        id: meta
+#        uses: docker/metadata-action@v5
+#        with:
+#          images: ${{ fromJSON(steps.resolve-docker.outputs.result).image }}
+#          tags: |
+#            type=semver,pattern=v{{version}}
+#            type=semver,pattern=v{{major}}.{{minor}}
+#            type=semver,pattern=v{{major}}
+#            type=semver,pattern={{raw}}
+#            type=raw,feat/spv-123_this_is_pretty_long_tag_and_it_should_be_truncated_below_128_chars_so_it_does_not_break_anything_when_pushed_to_docker_hub
+#            type=ref,event=branch,prefix=evbranch-
+#            type=ref,event=tag,prefix=evtag-
+#            type=sha
+#          labels: |
+#            ${{ fromJSON(steps.resolve-docker.outputs.result).isDockerhub && format('org.opencontainers.image.url=https://hub.docker.com/r/{0}', fromJSON(steps.resolve-docker.outputs.result).image) }}
+#          flavor: latest=true
