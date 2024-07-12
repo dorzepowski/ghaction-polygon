@@ -13,6 +13,11 @@ on:
         required: false
         default: ''
         type: string
+      enabled:
+        description: 'Enable the raw tag'
+        required: false
+        default: true
+        type: boolean
 #  push:
 #    branches:
 #      - main
@@ -23,15 +28,19 @@ on:
 run-name: "version = ${{ inputs.version }} | ref = ${{ inputs.ref }}"
 
 jobs:
-  release_default:
+  resolve-config:
     runs-on: ubuntu-latest
+    outputs:
+      ref: ${{ steps.git-ref.outputs.value }}
+      refType: ${{ steps.git-ref.outputs.type }}
+      version: ${{ steps.version.outputs.value }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref || inputs.version }}
       - name: Resolve ref type
-        # check based on the git repository if the inputs.version is a tag or branch or sha
+        # Resolves the git reference value and type of it (tag, branch, sha)
         id: git-ref
         run: |
           value="${{ inputs.ref || inputs.version }}"
@@ -45,36 +54,55 @@ jobs:
             echo "type=sha" >> $GITHUB_OUTPUT
           fi
 
+      - name: Sanitize version
+        # Adjust version to meet docker tag requirements
+        id: version
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const version = '${{ inputs.version }}';
+            sanitized = version.replace(/[^a-zA-Z0-9._-]+/g, '-')
+            sanitized = sanitized.substring(0, 128)
+            core.setOutput('value', sanitized)
+
       - name: Print debug
         run: |
           echo "Ref: ${{ steps.git-ref.outputs.value }}"
           echo "Type: ${{ steps.git-ref.outputs.type }}"
+          echo "Version: ${{ steps.version.outputs.value }}"
+  dockerize:
+    runs-on: ubuntu-latest
+    needs: resolve-config
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.resolve-config.outputs.ref }}
+      - name: Resolve docker configuration
+        id: resolve-docker
+        uses: actions/github-script@v7
+        with:
+          script: |
+            return {
+                image: "4chainstudio/ghaction-polygon",
+                isDockerhub: true,
+                isGhcr: false,
+            }
 
-#      - name: Resolve docker configuration
-#        id: resolve-docker
-#        uses: actions/github-script@v7
-#        with:
-#          script: |
-#            return {
-#                image: "4chainstudio/ghaction-polygon",
-#                isDockerhub: true,
-#                isGhcr: false,
-#            }
-#
-#      - name: Docker meta
-#        id: meta
-#        uses: docker/metadata-action@v5
-#        with:
-#          images: ${{ fromJSON(steps.resolve-docker.outputs.result).image }}
-#          tags: |
-#            type=semver,pattern=v{{version}}
-#            type=semver,pattern=v{{major}}.{{minor}}
-#            type=semver,pattern=v{{major}}
-#            type=semver,pattern={{raw}}
-#            type=raw,feat/spv-123_this_is_pretty_long_tag_and_it_should_be_truncated_below_128_chars_so_it_does_not_break_anything_when_pushed_to_docker_hub
-#            type=ref,event=branch,prefix=evbranch-
-#            type=ref,event=tag,prefix=evtag-
-#            type=sha
-#          labels: |
-#            ${{ fromJSON(steps.resolve-docker.outputs.result).isDockerhub && format('org.opencontainers.image.url=https://hub.docker.com/r/{0}', fromJSON(steps.resolve-docker.outputs.result).image) }}
-#          flavor: latest=true
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          context: git
+          images: ${{ fromJSON(steps.resolve-docker.outputs.result).image }}
+          tags: |
+            type=semver,pattern=v{{version}}
+            type=semver,pattern=v{{major}}.{{minor}}
+            type=semver,pattern=v{{major}}
+            type=semver,pattern={{raw}}
+            type=raw,${{ needs.resolve-config.outputs.version }},enable=${{ inputs.enabled }}
+            type=sha,enable=${{ inputs.enabled }}
+          labels: |
+            ${{ fromJSON(steps.resolve-docker.outputs.result).isDockerhub && format('org.opencontainers.image.url=https://hub.docker.com/r/{0}', fromJSON(steps.resolve-docker.outputs.result).image) }}
+          flavor: latest=true
+
