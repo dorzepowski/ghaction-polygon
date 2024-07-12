@@ -1,5 +1,6 @@
 name: Release
 
+run-name: "version = ${{ inputs.version }} | ref = ${{ inputs.ref }} | release = ${{ inputs.release }}"
 on:
   workflow_dispatch:
     inputs:
@@ -25,3 +26,7 @@ jobs:
       version: ${{ inputs.version }}
       ref: ${{ inputs.ref }}
       release_create: ${{ inputs.release }}
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.ON_RELEASE_SLACK_WEBHOOK_URL }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
