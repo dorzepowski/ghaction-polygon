@@ -18,11 +18,15 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            core.setOutput("myOutput", "success");
+            
             return {
                 image: "4chainstudio/ghaction-polygon",
                 isDockerhub: true,
                 isGhcr: false,
             }
+      - name: print debug
+        run: echo "${{ steps.resolve-docker.outputs.myOutput }}"
       - name: Checkout
         uses: actions/checkout@v4
       - name: Docker meta
