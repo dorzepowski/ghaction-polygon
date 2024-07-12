@@ -20,6 +20,8 @@ on:
 #    tags:
 #      - 'v*'
 
+run-name: "version = ${{ inputs.version }} | ref = ${{ inputs.ref }}"
+
 jobs:
   release_default:
     runs-on: ubuntu-latest
@@ -32,20 +34,21 @@ jobs:
         # check based on the git repository if the inputs.version is a tag or branch or sha
         id: git-ref
         run: |
-          echo "::set-output name=value::${{ inputs.ref || inputs.version }}"
-          type=$(git cat-file -t ${{ steps.resolve-ref.outputs.ref }})
+          value="${{ inputs.ref || inputs.version }}"
+          echo "value=$value" > $GITHUB_OUTPUT
+          type=$(git cat-file -t "$value")
           if [[ "$type" == "tag" ]]; then
-            echo "::set-output name=type::tag"
-          elif [[ "$type" == "commit" && "$(git branch --show-current)" == "${{ steps.resolve-ref.outputs.ref }}" ]]; then
-            echo "::set-output name=type::branch"
+            echo "type=tag" >> $GITHUB_OUTPUT
+          elif [[ "$type" == "commit" && "$(git branch --show-current)" == "$value" ]]; then
+            echo "type=branch" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=type::sha"
+            echo "type=sha" >> $GITHUB_OUTPUT
           fi
 
       - name: Print debug
         run: |
-          echo "Ref: ${{ steps.ref-type.outputs.value }}"
-          echo "Type: ${{ steps.ref-type.outputs.type }}"
+          echo "Ref: ${{ steps.git-ref.outputs.value }}"
+          echo "Type: ${{ steps.git-ref.outputs.type }}"
 
 #      - name: Resolve docker configuration
 #        id: resolve-docker
