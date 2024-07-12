@@ -91,18 +91,18 @@ jobs:
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@master
         with:
           context: git
           images: ${{ fromJSON(steps.resolve-docker.outputs.result).image }}
           tags: |
-            type=semver,pattern=v{{version}},enable=${{ needs.resolve-config.outputs.refType != 'sha' }}
-            type=semver,pattern=v{{major}}.{{minor}},enable=${{ needs.resolve-config.outputs.refType != 'sha' }}
-            type=semver,pattern=v{{major}},enable=${{ needs.resolve-config.outputs.refType != 'sha' }}
+            type=raw,value=latest,enable=${{ needs.resolve-config.outputs.refType == 'tag' }}
+            type=raw,priority=1000,value=${{ needs.resolve-config.outputs.version }}
+            type=semver,prefix=v,pattern={{version}},enable=${{ needs.resolve-config.outputs.refType != 'sha' }}
+            type=semver,prefix=v,pattern={{major}}.{{minor}},enable=${{ needs.resolve-config.outputs.refType != 'sha' }}
+            type=semver,prefix=v,pattern={{major}},enable=${{ needs.resolve-config.outputs.refType != 'sha' }}
             type=semver,pattern={{raw}},enable=${{ needs.resolve-config.outputs.refType != 'sha' }}
-            type=raw,${{ needs.resolve-config.outputs.version }},enable=${{ inputs.enabled }}
             type=sha,enable=${{ needs.resolve-config.outputs.refType != 'sha' }}
           labels: |
             ${{ fromJSON(steps.resolve-docker.outputs.result).isDockerhub && format('org.opencontainers.image.url=https://hub.docker.com/r/{0}', fromJSON(steps.resolve-docker.outputs.result).image) }}
-          flavor: latest=true,enable=${{ needs.resolve-config.outputs.refType == 'tag' }}
 
