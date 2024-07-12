@@ -3,16 +3,25 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
-      ref:
-        description: 'Git ref to checkout'
+      version:
+        description: 'Version to release'
         required: true
-        default: 'main'
+        default: ''
+        type: string
+      ref:
+        description: 'Ref to release'
+        required: false
+        default: ''
+        type: string
+      release:
+        description: 'Create a release'
+        required: false
+        default: false
+        type: boolean
 jobs:
   release_default:
     uses: bactions/workflows/.github/workflows/release-go-server.yml@norelease
     with:
-      version: ${{ inputs.ref }}
-      os: linux
-      cgo_enabled: true
-      release_binaries: false
-      release_create: false
+      version: ${{ inputs.version }}
+      ref: ${{ inputs.ref }}
+      release_create: ${{ inputs.release }}

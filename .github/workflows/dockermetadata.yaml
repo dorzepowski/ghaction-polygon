@@ -57,7 +57,7 @@ jobs:
           fi
           
           echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-          echo "::group::Outputs:"
+          echo "::group::Outputs"
           cat $GITHUB_OUTPUT
           echo "::endgroup::"
 
@@ -71,7 +71,7 @@ jobs:
             sanitized = version.replace(/[^a-zA-Z0-9._-]+/g, '-')
             sanitized = sanitized.substring(0, 128)
             core.setOutput('value', sanitized)
-            await core.group("Outpust", async () => {
+            await core.group("Outputs", async () => {
               core.info(`value: ${sanitized}`);
             })
 
