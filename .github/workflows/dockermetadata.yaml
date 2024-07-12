@@ -6,12 +6,12 @@ on:
       version:
         description: 'Version to release'
         required: true
-        default: 'main'
+        default: ''
         type: string
       ref:
         description: 'Ref to release'
         required: false
-        default: 'main'
+        default: ''
         type: string
 #  push:
 #    branches:
