@@ -97,8 +97,11 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
+          # [sha-issue] There is an issue with metadata-action when we checkout sha and use git context
+          # Because of [sha-issue] we're choosing the context
           context: ${{ needs.resolve-config.outputs.refType != 'sha' && 'git' || 'workflow' }}
           images: ${{ fromJSON(steps.resolve-docker.outputs.result).image }}
+          # Because of [sha-issue] we're setting short sha by ourselves
           tags: |
             type=raw,value=latest,enable=${{ needs.resolve-config.outputs.refType == 'tag' }}
             type=raw,value=${{ needs.resolve-config.outputs.version }}
@@ -106,8 +109,8 @@ jobs:
             type=semver,prefix=v,pattern={{major}}.{{minor}},enable=${{ needs.resolve-config.outputs.refType != 'sha' }}
             type=semver,prefix=v,pattern={{major}},enable=${{ needs.resolve-config.outputs.refType != 'sha' }}
             type=semver,pattern={{raw}},enable=${{ needs.resolve-config.outputs.refType != 'sha' }}
-            type=sha
+            type=raw,prefix=sha-,value=${{ needs.resolve-config.outputs.refSha }}
           labels: |
             ${{ fromJSON(steps.resolve-docker.outputs.result).isDockerhub && format('org.opencontainers.image.url=https://hub.docker.com/r/{0}', fromJSON(steps.resolve-docker.outputs.result).image) }}
-            ${{ needs.resolve-config.outputs.refType == 'sha' && format('org.opencontainers.image.revision=', needs.resolve-config.outputs.ref) }}
+            ${{ needs.resolve-config.outputs.refType == 'sha' && format('org.opencontainers.image.revision={0}', needs.resolve-config.outputs.ref) }}
 
