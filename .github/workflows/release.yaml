@@ -33,13 +33,18 @@ jobs:
     steps:
       - name: Print
         run: |
-          echo "::group::GH"
+          echo "::group::GH focused"
           echo "GH.ref: ${{ github.ref }}"
           echo "GH.sha: ${{ github.sha }}"
           echo "GH.run_id: ${{ github.run_id }}"
           echo "GH.run_number: ${{ github.run_number }}"
           echo "GH.run_attempt: ${{ github.run_attempt }}"
           echo "GH.event_name: ${{ github.event_name }}"
+          echo "::endgroup::"
+          echo "::group::GH whole"
+          echo "${{ toJson(github) }}" | jq -r '"github: ",.' 
+          echo "::endgroup::"
+          echo "::group::Event"
           echo "GH.event: $(jq . ${{ github.event_path }})"
           echo "::endgroup::"
 #  release_default:
