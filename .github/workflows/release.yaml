@@ -6,11 +6,6 @@ on:
     inputs:
       version:
         description: 'Version to release'
-        required: true
-        default: ''
-        type: string
-      ref:
-        description: 'Ref to release'
         required: false
         default: ''
         type: string
@@ -30,3 +25,12 @@ jobs:
       SLACK_WEBHOOK_URL: ${{ secrets.ON_RELEASE_SLACK_WEBHOOK_URL }}
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  print:
+    runs-on: ubuntu-latest
+    needs: [release_default]
+    steps:
+      - name: Print
+        run: |
+          echo "IMAGE: ${{ needs.release_default.outputs.imageName }}"
+          echo "VERSION: ${{ needs.release_default.outputs.imageVersion }}"
+          echo "docker pull ${{ needs.release_default.outputs.imageName }}:${{ needs.release_default.outputs.imageVersion }}"
