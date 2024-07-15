@@ -19,50 +19,14 @@ on:
         required: false
         default: false
         type: boolean
-  push:
-    tags:
-      - 'v*'
-  pull_request:
-    branches:
-      - main
-
-
 jobs:
-  print_job:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Print
-        run: |
-          echo "::group::GH focused"
-          echo "GH.ref: ${{ github.ref }}"
-          echo "GH.sha: ${{ github.sha }}"
-          echo "GH.run_id: ${{ github.run_id }}"
-          echo "GH.run_number: ${{ github.run_number }}"
-          echo "GH.run_attempt: ${{ github.run_attempt }}"
-          echo "GH.event_name: ${{ github.event_name }}"
-          echo "::endgroup::"
-          echo "::group::GH whole"
-          echo "${{ toJson(github) }}" | jq -r '"github: ",.' 
-          echo "::endgroup::"
-          echo "::group::Event"
-          echo "GH.event: $(jq . ${{ github.event_path }})"
-          echo "::endgroup::"
-#  release_default:
-#    uses: bactions/workflows/.github/workflows/release-go-server.yml@norelease
-#    with:
-#      version: ${{ inputs.version }}
-#      ref: ${{ inputs.ref }}
-#      release_create: ${{ inputs.release }}
-#    secrets:
-#      SLACK_WEBHOOK_URL: ${{ secrets.ON_RELEASE_SLACK_WEBHOOK_URL }}
-#      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-#      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-#  print:
-#    runs-on: ubuntu-latest
-#    needs: [release_default]
-#    steps:
-#      - name: Print
-#        run: |
-#          echo "IMAGE: ${{ needs.release_default.outputs.imageName }}"
-#          echo "VERSION: ${{ needs.release_default.outputs.imageVersion }}"
-#          echo "docker pull ${{ needs.release_default.outputs.imageName }}:${{ needs.release_default.outputs.imageVersion }}"
+  release_default:
+    uses: bactions/workflows/.github/workflows/release-go-server.yml@norelease
+    with:
+      version: ${{ inputs.version }}
+      ref: ${{ inputs.ref }}
+      release_create: ${{ inputs.release }}
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.ON_RELEASE_SLACK_WEBHOOK_URL }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

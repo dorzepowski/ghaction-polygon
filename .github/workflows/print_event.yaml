@@ -1,0 +1,40 @@
+name: Print context
+
+run-name: "event = ${{ github.event_name }} | ref = ${{ github.ref_name }} | version = ${{ inputs.version }}"
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release'
+        required: false
+        default: ''
+        type: string
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+
+
+jobs:
+  print_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print
+        run: |
+          echo "::group::GH focused"
+          echo "GH.ref: ${{ github.ref }}"
+          echo "GH.ref_name: ${{ github.ref_name }}"
+          echo "GH.sha: ${{ github.sha }}"
+          echo "GH.run_id: ${{ github.run_id }}"
+          echo "GH.run_number: ${{ github.run_number }}"
+          echo "GH.run_attempt: ${{ github.run_attempt }}"
+          echo "GH.event_name: ${{ github.event_name }}"
+          echo "::endgroup::"
+          echo "::group::GH whole"
+          echo "${{ toJson(github) }}" | jq -r '"github: ",.' 
+          echo "::endgroup::"
+          echo "::group::Event"
+          echo "GH.event: $(jq . ${{ github.event_path }})"
+          echo "::endgroup::"
