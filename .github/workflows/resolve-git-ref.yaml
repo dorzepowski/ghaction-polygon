@@ -1,13 +1,22 @@
 name: Test Git Ref
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
-      ref:
-        description: 'Ref to release'
-        required: false
-        default: ''
+      version:
+        required: true
         type: string
+        description: |
+          Version of the app to release.
+          By default this value will be used also as a git reference to checkout.
+          If you want to release from a different branch or tag, you can provide it in the ref input.
+      ref:
+        required: false
+        type: string
+        description: |
+          Git reference to checkout the code and use it for release.
+          If not provided, the version will be used as a ref.
+          It can be either a branch name, tag name or commit SHA (long version).
 #  push:
 #    branches:
 #      - main
@@ -38,7 +47,7 @@ jobs:
           # FIXME:
           # FIXME:
           # FIXME:
-          value="${{ inputs.ref || github.ref_name }}"
+          value="${{ inputs.ref || inputs.version }}"
           # FIXME:
           # FIXME:
           # FIXME:
