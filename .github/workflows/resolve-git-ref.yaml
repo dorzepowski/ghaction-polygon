@@ -1,0 +1,63 @@
+name: Test Git Ref
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Ref to release'
+        required: false
+        default: ''
+        type: string
+#  push:
+#    branches:
+#      - main
+#      - meta
+#    tags:
+#      - 'v*'
+
+run-name: "ref = ${{ inputs.ref }} | refname = ${{ github.ref_name }}"
+
+jobs:
+  resolve-config:
+    runs-on: ubuntu-latest
+    outputs:
+      ref: ${{ steps.git-ref.outputs.value }}
+      refType: ${{ steps.git-ref.outputs.type }}
+      refSha: ${{ steps.git-ref.outputs.sha }}
+      version: ${{ steps.version.outputs.value }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref_name }}
+      - name: Resolve ref type
+        # Resolves the git reference value and type of it (tag, branch, sha)
+        id: git-ref
+        run: |
+          # FIXME:
+          # FIXME:
+          value="${{ inputs.ref || github.ref_name }}"
+          # FIXME:
+          # FIXME:
+          echo "value=$value" > $GITHUB_OUTPUT
+          
+          echo "::group::Type resolution"
+          type=$(git cat-file -t "$value")
+          echo "type=$type"
+          if [[ "$type" == "tag" ]]; then
+            echo "type=tag"
+            echo "type=tag" >> $GITHUB_OUTPUT
+          elif [[ "$type" == "commit" && "$(git branch --show-current)" == "$value" ]]; then
+            echo "type=branch"
+            echo "type=branch" >> $GITHUB_OUTPUT
+          else
+            echo "type is not tag nor branch, we assume it's a sha"
+            echo "type=sha" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "::endgroup::"
+          echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "::group::Outputs"
+          cat $GITHUB_OUTPUT
+          echo "::endgroup::"
+

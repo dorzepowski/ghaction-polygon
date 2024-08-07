@@ -9,16 +9,12 @@ on:
         required: false
         default: ''
         type: string
-      release:
-        description: 'Create a release'
-        required: false
-        default: false
-        type: boolean
+
 jobs:
   release_default:
     uses: bactions/workflows/.github/workflows/release-go-server.yml@norelease
     with:
-      version: ${{ inputs.version }}
+      version: ${{ inputs.version || inputs.ref_name }}
       ref: ${{ inputs.ref }}
       release_create: ${{ inputs.release }}
     secrets:
