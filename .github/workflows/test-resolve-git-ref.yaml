@@ -1,5 +1,5 @@
 name: Call Test Git Ref
-run-name: "ref = ${{ inputs.ref }} | refname = ${{ github.ref_name }}"
+run-name: "Test version ${{ inputs.version || github.ref_name }} from ref  ${{ github.ref }}"
 
 on:
   workflow_dispatch:
@@ -14,4 +14,5 @@ jobs:
   release:
     uses: ./.github/workflows/resolve-git-ref.yaml
     with:
-      version: ${{ inputs.ref || github.ref_name }}
+      version: ${{ inputs.version || github.ref_name }}
+      ref: ${{ github.ref }}
