@@ -36,7 +36,11 @@ jobs:
         run: |
           # FIXME:
           # FIXME:
+          # FIXME:
+          # FIXME:
           value="${{ inputs.ref || github.ref_name }}"
+          # FIXME:
+          # FIXME:
           # FIXME:
           # FIXME:
           echo "value=$value" > $GITHUB_OUTPUT
