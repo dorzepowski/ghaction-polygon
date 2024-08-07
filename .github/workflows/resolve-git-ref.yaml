@@ -43,21 +43,17 @@ jobs:
         # Resolves the git reference value and type of it (tag, branch, sha)
         id: git-ref
         run: |
-          # FIXME:
-          # FIXME:
-          # FIXME:
-          # FIXME:
           value="${{ inputs.ref || inputs.version }}"
-          # FIXME:
-          # FIXME:
-          # FIXME:
-          # FIXME:
           echo "value=$value" > $GITHUB_OUTPUT
           
           echo "::group::Type resolution"
           type=$(git cat-file -t "$value")
           echo "type=$type"
           if [[ "$type" == "tag" ]]; then
+            echo "type=tag"
+            echo "type=tag" >> $GITHUB_OUTPUT
+          elif [[ "$type" == "commit" && "$(git rev-parse --verify -q "$value")" != "" ]]; then
+            echo "not annotated tag was used"
             echo "type=tag"
             echo "type=tag" >> $GITHUB_OUTPUT
           elif [[ "$type" == "commit" && "$(git branch --show-current)" == "$value" ]]; then
