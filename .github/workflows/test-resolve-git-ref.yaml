@@ -1,18 +1,17 @@
-name: Call Test Git Ref
-run-name: "Test version ${{ inputs.version || github.ref_name }} from ref  ${{ github.ref }}"
+name: Print workflow call event
+run-name: "Print workflow call for version ${{ inputs.version || github.ref_name }} from ref  ${{ github.ref }}"
 
 on:
   workflow_dispatch:
     inputs:
-      ref:
-        description: 'Ref to release'
+      version:
+        description: 'Version'
         required: false
         default: ''
         type: string
 
 jobs:
   release:
-    uses: ./.github/workflows/resolve-git-ref.yaml
+    uses: ./.github/workflows/print_event.yaml
     with:
       version: ${{ inputs.version || github.ref_name }}
-      ref: ${{ github.ref }}

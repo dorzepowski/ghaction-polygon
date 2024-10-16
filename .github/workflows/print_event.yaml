@@ -16,6 +16,14 @@ on:
     branches:
       - main
 
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version to release'
+        required: false
+        default: ''
+        type: string
+
 
 jobs:
   print_job:
