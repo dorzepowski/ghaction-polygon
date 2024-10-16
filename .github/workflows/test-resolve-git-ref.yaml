@@ -11,6 +11,10 @@ on:
         type: string
 
 jobs:
+  release_defaul:
+    uses: ./.github/workflows/print_event.yaml
+    with:
+      version: ${{ inputs.version || github.ref_name }}
   release:
     uses: ./.github/workflows/print_event.yaml
     with:
