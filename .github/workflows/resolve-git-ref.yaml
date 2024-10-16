@@ -49,37 +49,37 @@ jobs:
           echo "::group::Type resolution"
           # Strip refs/heads/, refs/tags/, or refs/ prefix to get a simple ref name
           if [[ "$value" == refs/heads/* ]]; then
-          ref_name="${value#refs/heads/}"
-          ref_type="branch"
+            ref_name="${value#refs/heads/}"
+            ref_type="branch"
           elif [[ "$value" == refs/tags/* ]]; then
-          ref_name="${value#refs/tags/}"
-          ref_type="tag"
+            ref_name="${value#refs/tags/}"
+            ref_type="tag"
           elif [[ "$value" == refs/* ]]; then
-          ref_name="${value#refs/}"
-          ref_type="unknown"
+            ref_name="${value#refs/}"
+            ref_type="unknown"
           else
-          ref_name="$value"
-          ref_type="unknown"
+            ref_name="$value"
+            ref_type="unknown"
           fi
           
           echo "possible type=$ref_type"
           
           # Determine if the ref is a tag, branch, or commit SHA
           if git show-ref --verify --quiet "refs/heads/$ref_name"; then
-          ref_type="branch"
+            ref_type="branch"
           elif git show-ref --verify --quiet "refs/tags/$ref_name"; then
-          ref_type="tag"
+            ref_type="tag"
           elif git cat-file -e "$ref_name^{commit}" 2>/dev/null; then
-          ref_type="commit"
+            ref_type="commit"
           else
-          ref_type="unknown"
+            ref_type="unknown"
           fi
           
           echo "confirmed type=$ref_type"
           echo "::endgroup::"
           if [ "$ref_type" == "unknown" ]; then
-          echo "Cannot determine the type of ref: $value"
-          exit 1
+            echo "Cannot determine the type of ref: $value"
+            exit 1
           fi
           
           echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT

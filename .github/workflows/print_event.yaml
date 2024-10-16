@@ -21,6 +21,11 @@ jobs:
   print_job:
     runs-on: ubuntu-latest
     steps:
+      - name: Print Job
+        run: |
+          echo "::group::Job"
+          echo '${{ toJson(job) }}'
+          echo "::endgroup::"
       - name: Print
         run: |
           echo "::group::GH focused"
@@ -33,7 +38,7 @@ jobs:
           echo "GH.event_name: ${{ github.event_name }}"
           echo "::endgroup::"
           echo "::group::GH whole"
-          echo "${{ toJson(github) }}" | jq -r '"github: ",.' 
+          echo '${{ toJson(github) }}' | jq -r '"github: ",.' 
           echo "::endgroup::"
           echo "::group::Event"
           echo "GH.event: $(jq . ${{ github.event_path }})"
