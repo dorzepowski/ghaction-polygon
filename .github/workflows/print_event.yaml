@@ -34,6 +34,12 @@ jobs:
           echo "::group::Job"
           echo '${{ toJson(job) }}'
           echo "::endgroup::"
+      - name: Print Jobs
+        if: jobs
+        run: |
+          echo "::group::Jobs"
+          echo '${{ toJson(jobs) }}'
+          echo "::endgroup::"
       - name: Print
         run: |
           echo "::group::GH focused"
