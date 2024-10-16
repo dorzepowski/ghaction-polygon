@@ -24,7 +24,7 @@ on:
 #    tags:
 #      - 'v*'
 
-run-name: "ref = ${{ inputs.ref }} | refname = ${{ github.ref_name }}"
+run-name: "ref = ${{ inputs.ref }} | version ${{inputs.version}} | refname = ${{ github.ref_name }}"
 
 jobs:
   resolve-config:
