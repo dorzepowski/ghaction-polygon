@@ -34,11 +34,10 @@ jobs:
           echo "::group::Job"
           echo '${{ toJson(job) }}'
           echo "::endgroup::"
-      - name: Print Jobs
-        if: jobs
+      - name: Print Runner
         run: |
           echo "::group::Jobs"
-          echo '${{ toJson(jobs) }}'
+          echo '${{ runner.name }}'
           echo "::endgroup::"
       - name: Print
         run: |
