@@ -29,6 +29,15 @@ jobs:
   print_job:
     runs-on: ubuntu-latest
     steps:
+
+      - name: workflow Id
+        id: workflow-run-id
+        run: |
+          workflow_run_id="${{ github.run_id }}-${{ github.run_number }}-$(date +%s)"
+          echo "workflowRunId=$workflow_run_id" >> $GITHUB_OUTPUT
+          echo "::group::Outputs"
+          cat $GITHUB_OUTPUT
+          echo "::endgroup::"
       - name: Print Job
         run: |
           echo "::group::Job"
