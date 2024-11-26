@@ -15,6 +15,17 @@ on:
   pull_request:
     branches:
       - main
+  issues:
+    types:
+      - opened
+      - labeled
+      - unlabeled
+      - edited
+  issue_comment:
+    types:
+      - created
+      - edited
+      - deleted
 
   workflow_call:
     inputs:
