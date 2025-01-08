@@ -93,8 +93,11 @@ jobs:
           echo "GH.event_name: ${{ github.event_name }}"
           echo "::endgroup::"
           echo "::group::GH whole"
-          echo '${{ toJson(github) }}' | jq -r '"github: ",.' 
+          echo 'github:'
+          echo $GH_OBJECT 
           echo "::endgroup::"
           echo "::group::Event"
           echo "GH.event: $(jq . ${{ github.event_path }})"
           echo "::endgroup::"
+        env:
+          GH_OBJECT: ${{ toJson(github) }}
